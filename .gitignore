@@ -1,0 +1,15 @@
+*.toc
+*.aux
+*.log
+*.blg
+*.fls        
+*.soc
+*.synctex.gz
+*.fdb
+*.acn
+*.glo
+report.bbl
+report.fdb_latexmk
+report.ist
+report.out
+report.pdf
