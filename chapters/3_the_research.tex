@@ -1,9 +1,5 @@
 \chapter{The research: Development of a flight simulation model}
 
-lskjdfbvlsdfkjdjvnlskjfgn
-sdakbkgjehsflbgjsldrkgjbsrt
-waeoucfhwerbfgvearhk
-
 This chapter will focus on the work performed during the internship. It starts defining the main task and goals of the project and continues with a description of the methodology used. Then it focuses of the work done during the internship and finishes by presenting the end results.
 
 \section{Problem statement}
@@ -33,10 +29,10 @@ The end goal of the project is to research into the development of the tools nec
 
 \section{Work performed}
 \subsection{Introduction and familiarization with the company and project}
-The first step was to gain knowledge on the development that had already been done within DAWN, gather information on the current equipment and familiarize with the tools available. \\
+The first step was to gain knowledge on the development that had already been done within DAWN, gather information on the current equipment and familiarize with the tools available.
 
 \subsubsection{Current equipment}
-The main flight computer being used on the current vehicle is the Pixhawk 2 running the Ardupilot autopilot software. The Pixhawk 2 is an open source flight computer designed by the Pixhawk open hardware community and thanks to its integrated sensors, redundant hardware and compact design it provides all the basic hardware needed to safely fly a small to medium sized drone. Ardupilot is a well developed open source autopilot software, it fully supports the Pixhawk 2 and provides the control, state estimation and navigation software needed to fly the current flight vehicle. \\
+The main flight computer being used on the current vehicle is the Pixhawk 2 running the Ardupilot autopilot software. The Pixhawk 2 is an open source flight computer designed by the Pixhawk open hardware community and thanks to its integrated sensors, redundant hardware and compact design it provides all the basic hardware needed to safely fly a small to medium sized drone. Ardupilot is a well developed open source autopilot software, it fully supports the Pixhawk 2 and provides the control, state estimation and navigation software needed to fly the current flight vehicle.
 
 \subsubsection{Familiarization tasks}
 Since the to be developed modeling tools would eventually have to be used with the Pixhawk and interface with Ardupilot two tasks where performed in order to familiarize with Ardupilot. The first tasks was the addition of new telemetry packages to the Ardupilot telemetry system. During this task basic knowledge was collected on the structure of the Ardupilot software and how to modify it. \\
@@ -50,17 +46,21 @@ In the end JSBSim was chosen. JSBSim is an open source \gls{fdm} software librar
 \subsection{Plan of approach}
 After completing the familiarization tasks a plan of approach was made. As mentioned in the problem statement there are several options when it comes to determining the aerodynamic coefficients necessary to create the flight models. Wind tunnel tests and \gls{cfd} are not an option due to the limited time frame of the internship and the lack of expertise necessary to perform these. This leaves the empirical methods and system identification as the only options. \\
 
-The empirical tools are able to quickly give an estimate of the aerodynamic coefficients, however these will be inaccurate and it is thus necessary to correct them if they will be used to design the control systems. Aerodynamic models based the system identification of real flight data are more accurate but since this requires the aircraft to be physically flown it limits the amount of flight data that can be collected. This can result in inaccuracies in the model or a model that is only valid for a limited set of flight conditions. \\
+Empirical tools are able to quickly give an estimate of the aerodynamic coefficients, however these will be inaccurate and it is necessary to correct them if they will be used to design the control systems. Aerodynamic models based the system identification of real flight data are more accurate but since this requires the aircraft to be physically flown it limits the amount of flight data that can be collected. This can result in inaccuracies in the model or a model that is only valid for a limited set of flight conditions. \\
 
 Thus the plan of approach is to combine both methods. The empirical tools will be used to create a large set of \textit{cheap} coefficients for a wide range of flight conditions and the \textit{expensive} coefficients will be determined with system identification of real flight data. This means that a tool to combine the two sets of coefficients will have to be developed.\\
 
-Since the focus for now will be on the development of these tools. It is necessary to have a set of flight data for which the correct aerodynamic model is known. The easiest way to get such data is to calculate it using a simulation. Thus JSBSim will be used to generate this test data.
+Since the focus for now will be on the development of these tools. It is necessary to have a set of flight data for which the correct aerodynamic model is known. The easiest way to get such data is to calculate it using a simulation. Thus JSBSim will be used to generate this test data.\\
+
+Digital Datcom is a freely available program capable if calculating the aerodynamic coefficients using empirical method, It is used to create the aerodynamic models used to develop the rest of the tools.\\
+
+The two step method is chosen as the system identification method. This consists of 
 
 \subsection{3rd party tools interface development}
 To limit the amount of work necessary to complete these tasks, some third party software packages will be used. However since the to be developed tools will be written in Python it's necessary to make sure it is possible to interface with these tools from within a python script. The programs that will need interfaces are JSBSim and Digital Datcom.
 
 \subsubsection{JSBSim}
-JSBSim is an opensource \gls{fdm} software library written in C++ and by default provides no python bindings. So the first step was to look for existing python interfaces. The search revealed two possible options, "JSBSim Python" and "PyJSBSim". \\
+JSBSim is an open-source \gls{fdm} software library written in C++ and by default provides no python bindings. So the first step was to look for existing python interfaces. The search revealed two possible options, "JSBSim Python" and "PyJSBSim". \\
 
 Since the Sourceforge website was down at the time, the developer of "JSBSim Python" was directly contacted in order to get a copy of the source code and documentation. This revealed that the library had not been updated since 2007 and that it would probably require modifications in order to make it run with the current versions of JSBSim and Python. \\
 
@@ -74,7 +74,7 @@ As mentioned before, a tool had to be developed in order to to create the JSBSim
 
 However before development of this tool could start, the aerodynamic model had to be defined. The reason for this is because JSBSim does not have an aerodynamic model. Instead the equations to calculate the aerodynamic forces need to be given in the input \gls{xml} files. To keep it simple, the linear model described in the TU Delft Flight dynamics course was used as the basis \cite{fdreader}. \\
 
-The aerodynamic forces and moments are calculated using equations \ref{eq:f_a} and \ref{m_a}. The aerodynamic coefficients in the body reference frame are defined in \ref{eq:body_coefs} and the dimensionless rates used in \ref{eq:body_coefs} are defined in \ref{eq:dim_less_rates}.
+The aerodynamic forces and moments are calculated using equations \autoref{eq:f_a} and \autoref{eq:m_a}. The aerodynamic coefficients in the body reference frame are defined in \autoref{eq:body_coefs} and the dimensionless rates used in \autoref{eq:body_coefs} are defined in \autoref{eq:dim_less_rates}.
 
 \begin{equation}
 \label{eq:f_a}
@@ -119,21 +119,152 @@ The aerodynamic forces and moments are calculated using equations \ref{eq:f_a} a
 \end{array}
 \end{equation}
 
-Since the aircraft is assumed to be trimmed at the beginning of the simulation, it is assumed that the thrust equals the aerodynamic drag. Thus the thrust and the aerodynamic force term with $C_{x_0}$ cancel each other out and $C_{x_0}$ is thus be removed from the equation. Thus the equation for the $C_x$ coefficient is defined in \ref{c_x}\\
+Since the aircraft is assumed to be trimmed at the beginning of the simulation, It is assumed that the thrust equals the aerodynamic drag. Thus the thrust and the aerodynamic force coefficient term $C_{x_0}$ cancel each other out. The $C_{x_0}$ term can then be removed from the equation and it is not necessary to give JSBSim the engine thrust. Thus the new equation for the $C_X$ coefficient can be written as in \autoref{eq:c_x}
 
 \begin{equation}
-\label{c_x}
+\label{eq:c_x}
 {C_X} = ({C_{{X_u}}} - 2\;{C_{{X_0}}})\;\hat u + {C_{{X_\alpha }}}\alpha  + {C_{{X_{{\alpha ^2}}}}}{\alpha ^2} + C_{{X_{\dot{\alpha}}}}\hat{\dot{\alpha}}  + {C_{{X_q}}}\hat q + {C_{{X_{{\delta _e}}}}}{\delta _e}
+\end{equation}\\
+
+In order to check whether the aerodynamic model is correct it is necessary to compare the simulation results with a different simulation. To do this the \gls{lti} model from the flight dynamics reader\cite{fdreader} has been chosen. This model is defined in Equations \ref{eq:lti_sym} and \ref{eq:lti_asym}. The equations for the elements these matrices are given in \autoref{fig:completetable}. The coefficients used in the test are those for the Cessna Ce500 'Citation' during cruise and are given in \autoref{fig:coeftable}\\
+
+
+\begin{equation}
+\label{eq:lti_sym}
+\left[ {\begin{array}{*{20}{c}}
+    {\dot u} \\ 
+    {\dot \alpha } \\ 
+    {\dot \theta } \\ 
+    {\dot q} 
+\end{array}} \right] = \underbrace {\left[ {\begin{array}{*{20}{c}}
+    {{x_u}}&{{x_\alpha }V}&{{x_\theta }V}&0 \\ 
+    {{z_u}\tfrac{1}{V}}&{{z_\alpha }}&{{z_\theta }}&{{z_q}\tfrac{{\bar c}}{V}} \\ 
+    0&0&0&1 \\ 
+    {{m_u}\tfrac{1}{{\bar c}}}&{{m_\alpha }\tfrac{V}{{\bar c}}}&{{m_\theta }\tfrac{V}{{\bar c}}}&{{m_q}} 
+\end{array}} \right]}_{{A_{symmetric}}}\left[ {\begin{array}{*{20}{c}}
+    u \\ 
+    \alpha  \\ 
+    \theta  \\ 
+    q 
+\end{array}} \right] + \underbrace {\left[ {\begin{array}{*{20}{c}}
+    {{x_{{\delta _e}}}V} \\ 
+    {{z_{{\delta _e}}}} \\ 
+    0 \\ 
+    {{m_{{\delta _e}}}\tfrac{V}{{\bar c}}} 
+\end{array}} \right]}_{{B_{symmetric}}}{\delta _e}
 \end{equation}
 
-In order to check whether the aerodynamic model is correct it is neccesary to compare the simulation results with a different simulation. to do this the space state model from the flight dynamics reader\cite{fdreader} was chosen. The coefficients used in the test are those for the Cessna Ce500 'Citation' during cruise as there available in the same reader.\\
-
-A JSBSim input file was manually created with the aerodynamic model given above and the values for the Citation where filled in. The results are shown in figures  
 
 
 
+\begin{equation}
+\label{eq:lti_asym}
+\left[ {\begin{array}{*{20}{c}}
+    {\dot \beta } \\ 
+    {\dot \varphi } \\ 
+    {\dot p} \\ 
+    {\dot r} 
+\end{array}} \right] = \underbrace {\left[ {\begin{array}{*{20}{c}}
+    {{y_\beta }}&{{y_\varphi }}&{{y_p}\tfrac{b}{{2V}}}&{{y_r}\tfrac{b}{{2V}}} \\ 
+    0&0&1&0 \\ 
+    {{l_\beta }\tfrac{{2V}}{b}}&0&{{l_p}}&{{l_r}} \\ 
+    {{n_\beta }\tfrac{{2V}}{b}}&0&{{n_p}}&{{n_r}} 
+\end{array}} \right]}_{{A_{asymmetric}}}\left[ {\begin{array}{*{20}{c}}
+    \beta  \\ 
+    \varphi  \\ 
+    p \\ 
+    r 
+\end{array}} \right] + \underbrace {\left[ {\begin{array}{*{20}{c}}
+    0&{{y_{{\delta _r}}}} \\ 
+    0&0 \\ 
+    {{l_{{\delta _a}}}\tfrac{{2V}}{b}}&{{l_{{\delta _r}}}\tfrac{{2V}}{b}} \\ 
+    {{n_{{\delta _a}}}\tfrac{{2V}}{b}}&{{n_{{\delta _r}}}\tfrac{{2V}}{b}} 
+\end{array}} \right]}_{{B_{asymmetric}}}\left[ {\begin{array}{*{20}{c}}
+    {{\delta _a}} \\ 
+    {{\delta _r}} 
+\end{array}} \right]
+\end{equation}
+
+\begin{figure}
+\centering
+\includegraphics[width=14cm]{figures/tablecomplete.png}
+\caption{Coefficient table for the symmetric (left) and the asymmetric (right) modes.}
+\label{fig:completetable}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=14cm]{figures/tablecoefs.png}
+\caption{Symmetric and asymmetric stability and control derivatives for the Cessna Ce500 ‘Citation’, Cruise}
+\label{fig:coeftable}
+\end{figure}
 
 
+A JSBSim input file was manually created with the aerodynamic model given above with the values for the Citation where filled in. The results are shown in Figures~\ref{fig:lti_elevator},~\ref{fig:lti_aileron}~and~\ref{fig:lti_rudder}. As it can be seen the JSBSim and the \gls{lti} system give roguhly the same results, specially in the first few simulation seconds. Thus the JSBSim model is deemed good enough to be used to generate test flight data.
+
+
+\begin{figure}
+\centering
+\includegraphics[width=14cm]{figures/lti_elevator}
+\caption{Response curves for a step elevator deflection ($\Delta\delta_e=-0.005\ [Rad]$ calculated by JSBSim and the \gls{lti} model.)}
+\label{fig:lti_elevator}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=14cm]{figures/lti_aileron}
+\caption{Response curves for a pulse shaped aileron deflection ($\Delta\delta_a=0.025\ [Rad]$ calculated by JSBSim and the \gls{lti} model.)}
+\label{fig:lti_aileron}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=14cm]{figures/lti_rudder}
+\caption{Response curves for a pulse shaped rudder deflection ($\Delta\delta_r=0.025\ [Rad]$ calculated by JSBSim and the \gls{lti} model.)}
+\label{fig:lti_rudder}
+\end{figure}
+
+
+\subsubsection{Digital Datcom}
+Digital Datcom is a program capable of calculating the aerodynamic coefficients using empirical methods contained in the \gls{usaf} Stability and Control Datcom (Data Compendium). The source code for Digital Datcom is available online, however Digital Datcom is written in Fortran. Thus it has been decided to create the Python wrapper around a pre-compiled executable. Datcom+ has thus been chosen. Datcom+ is a modified variant of Digital Datcom which has been extended with extra tools and output formats and is available as a pre-compiled binary file.\\
+
+The Datcom+ wrapper is simple. It consists of a template file with the geometry of the Cessna Ce550 'Citation~II'. The flight conditions and control inputs are left blank since these are filled in by the Python wrapper. This however means that the current wrapper can only generate coefficients for the Citation II. It will thus be necessary to extend this wrapper in the future, but for now it is enough to test and demonstrate the tools being developed.\\
+
+One drawback of Digital Datcom is that not all coefficients can be calculated using it. $C_{X_{\alpha^2}}$ is calculated by fitting a second order polynomial on the value of $C_X$ at different angles of attack. The value of $C_{X_{\alpha^2}}$ will then be the value of the highest order term of the polynomial as it's shown in \autoref{eq:c_x_alpha2}\\
+
+\begin{equation}
+\label{eq:c_x_alpha2}
+{C_X}(\alpha ) = {C_{X_{\alpha ^2}}}{\alpha ^2} + {C_{{X_\alpha }}}\alpha  + {C_{{X_0}}}
+\end{equation}
+ 
+The rest of the unknown coefficients are either left at zero or a value is chosen such that the resulting model is stable. Keep in mind the goal is to generate aerodynamic models that can be used to test the system identification and coefficient mixing tools and are not required to accurately represent a real aircraft. \\
+
+Since the goal is to simulate an aircraft, more information is needed besides the aerodynamic coefficients. These are the masses, reference area, lengths, etc. most of this information has been collected from 'Jane's All The World's Aircraft: Development \& Production' \cite{janes}. However it was not possible to find a reference containing the \gls{mmoi} for the Citation II. It was thus decided to estimate the \gls{mmoi} using the Class I method described in 'Airplane Design Part V: Component Weight Estimation' by J.~Roskam\cite{roskam_5}. These are Equations~\ref{eq:ros_ixx},~\ref{eq:ros_iyy}~and~\ref{eq:ros_izz}.
+
+
+\begin{equation}
+    \label{eq:ros_ixx}
+    {I_{XX}} = {b^2}\bar R_X^2\frac{W}{{4g}}
+\end{equation}
+\begin{equation}
+    \label{eq:ros_iyy}
+    {I_{YY}} = {L^2}\bar R_Y^2\frac{W}{{4g}}
+\end{equation}
+\begin{equation}
+    \label{eq:ros_izz}
+    {I_{ZZ}} = {e^2}\bar R_Y^2\frac{W}{{4g}}
+\end{equation}
+
+Where b and L are the wingspan and overall length of the aircraft and e is given by \autoref{eq:ros_e}.
+
+\begin{equation}
+    \label{eq:ros_e}
+    e = \frac{{b + L}}{2}
+\end{equation}
+
+The non-dimensional radius of gyration $\bar{R}_X$, $\bar{R}_Y$ and $\bar{R}_Z$ tends to be the same for aircraft with the same mission orientation. This assumption is however not necessary in the case of the Citation II, since a table with the non-dimensional radius of gyration is available for this aircraft.\cite{roskam_5}\\
+
+Unfortunately there is no Class I method to determine $I_{XZ}$, thus a Class II analysis is necessary to determine it's value. Since this type of analysis would take to much time and insufficient information on the Citation~II is known, it has been decided to assume a fixed value of $2483.2\ [Kg\ m^2]$. This was calculated by using the same value for $K_{XZ}$ as of the Citation.
 
 
 
