@@ -1,0 +1,187 @@
+\chapter{The research: Development of a flight simulation model}
+This chapter will focus on the work performed during the internship. It starts defining the main task and goals of the project and continues with a description of the methodology used. Then it focuses of the work done during the internship and finishes by presenting the end results.
+
+\section{Problem statement}
+Currently DAWN has began with the flight tests of their first research vehicle. As development is progressing the need for research into the \gls{cns} is growing. An important part in the development of these system are the flight models needed to tune controllers, aircraft design, systems software and hardware in the loop tests, etc. 
+
+\subsection{Problem analysis and definition}
+The development of these flight models is not easy, with the main problem being determining the aerodynamic properties of the aircraft. There are several options for determining the aerodynamic coefficients, each one with the own advantages and disadvantages.
+
+\begin{itemize}
+\item \textbf{Empirical models} \\ It is possible to get an estimate of the aerodynamic coefficients by using empirical models and tools. The advantage of these models is that they can quickly determine the aerodynamic coefficients for a wide range of flight conditions. However these tools are not accurate and can only be used for the early design stages.
+
+\item \textbf{Computational models} \\ Another option is to calculate these coefficients based on numerical methods such as \gls{cfd} or potential flow. The main advantage is that they will give more accurate results than the empirical models and since no physical model is needed it's possible to change the design in order to optimize its flight characteristics. The disadvantages are that these methods can be computationally intensive and require special knowledge in order to perform them correctly.
+
+\item \textbf{Wind tunnel} \\
+Wind tunnel tests can give accurate estimates on the aerodynamic properties of the aircraft and since no full sized aircraft is needed it is still possible to perform changes to the aircraft. However wind tunnel availability and the limited number of flight conditions in which wind tunnel tests can be performed are the main problems.
+
+\item \textbf{Real flight system identification} \\
+The aerodynamic properties of the aircraft can also be determined using measurements taken during real flights. The main advantage is that if done correctly, these methods will give the most accurate estimate of the aerodynamic properties of the aircraft, which will give the information necessary to optimize the control systems. The main drawbacks are that a flight capable model is needed and the limited amount of flight data that can be collected.
+\end{itemize}
+
+Thus the main problem to be solved is: How can an accurate flight model be created with the resources currently available within DAWN.
+
+\subsection{Goal and end product}
+The end goal of the project is to research into the development of the tools necessary to create accurate flight simulation models. The end product will be a set of basic tools demonstrating the steps that need to be taken and a list of recommendations for the further development of these tools.
+
+\section{Methodology}
+
+\section{Work performed}
+\subsection{Introduction and familiarization with the company and project}
+The first step was to gain knowledge on the development that had already been done within DAWN, gather information on the current equipment and familiarize with the tools available. \\
+
+\subsubsection{Current equipment}
+The main flight computer being used on the current vehicle is the Pixhawk 2 running the Ardupilot autopilot software. The Pixhawk 2 is an open source flight computer designed by the Pixhawk open hardware community and thanks to its integrated sensors, redundant hardware and compact design it provides all the basic hardware needed to safely fly a small to medium sized drone. Ardupilot is a well developed open source autopilot software, it fully supports the Pixhawk 2 and provides the control, state estimation and navigation software needed to fly the current flight vehicle. \\
+
+\subsubsection{Familiarization tasks}
+Since the to be developed modeling tools would eventually have to be used with the Pixhawk and interface with Ardupilot two tasks where performed in order to familiarize with Ardupilot. The first tasks was the addition of new telemetry packages to the Ardupilot telemetry system. During this task basic knowledge was collected on the structure of the Ardupilot software and how to modify it. \\
+
+The second task was setting up a \gls{sitl} test setup. This consisted of running the Ardupilot software on a development computer, in this case a laptop, and connect its sensor input, control outputs and telemtry outputs to a \gls{fdm} and a ground station software running on the same computer. The purpose of this setup is to provide an environment in which modifications to the Ardupilot software can be rapidly and safely tested without the need of the hardware. This allows the use of advanced software development tools that are not available for embedded systems, greatly simplifying the software development process without putting any of the equipment at risk. \\
+
+Ardupilot's \gls{sitl} software package gives a wide range of options when it comes to the \gls{fdm} programs it can be connected to. Since further development of the simulation model synthesizing tools would depend on the \gls{fdm} chosen during this task a small trade-of was made to choose the appropriate tool for this stage of the project. The main points of interest for the \gls{fdm} where that it had to be easy to interface with from external software, easy to extend with new features, stable and accurate. \\
+
+In the end JSBSim was chosen. JSBSim is an open source \gls{fdm} software library capable of modeling a wide range of aerospace vehicles. It's used by many open source flight simulation software packages most notably Flightgear and OpenEaagles and has been used on several university research projects around the world. The latest release contains all the features that will be necessary for the foreseeable future and its designed allows it to be easily extended or incorporated into other software tools. This is also the default \gls{fdm} for the Ardupilot SILT software and is thus the best supported one.
+
+\subsection{Plan of approach}
+After completing the familiarization tasks a plan of approach was made. As mentioned in the problem statement there are several options when it comes to determining the aerodynamic coefficients necessary to create the flight models. Wind tunnel tests and \gls{cfd} are not an option due to the limited time frame of the internship and the lack of expertise necessary to perform these. This leaves the empirical methods and system identification as the only options. \\
+
+The empirical tools are able to quickly give an estimate of the aerodynamic coefficients, however these will be inaccurate and it is thus necessary to correct them if they will be used to design the control systems. Aerodynamic models based the system identification of real flight data are more accurate but since this requires the aircraft to be physically flown it limits the amount of flight data that can be collected. This can result in inaccuracies in the model or a model that is only valid for a limited set of flight conditions. \\
+
+Thus the plan of approach is to combine both methods. The empirical tools will be used to create a large set of \textit{cheap} coefficients for a wide range of flight conditions and the \textit{expensive} coefficients will be determined with system identification of real flight data. This means that a tool to combine the two sets of coefficients will have to be developed.\\
+
+Since the focus for now will be on the development of these tools. It is necessary to have a set of flight data for which the correct aerodynamic model is known. The easiest way to get such data is to calculate it using a simulation. Thus JSBSim will be used to generate this test data.
+
+\subsection{3rd party tools interface development}
+To limit the amount of work necessary to complete these tasks, some third party software packages will be used. However since the to be developed tools will be written in Python it's necessary to make sure it is possible to interface with these tools from within a python script. The programs that will need interfaces are JSBSim and Digital Datcom.
+
+\subsubsection{JSBSim}
+JSBSim is an opensource \gls{fdm} software library written in C++ and by default provides no python bindings. So the first step was to look for existing python interfaces. The search revealed two possible options, "JSBSim Python" and "PyJSBSim". \\
+
+Since the Sourceforge website was down at the time, the developer of "JSBSim Python" was directly contacted in order to get a copy of the source code and documentation. This revealed that the library had not been updated since 2007 and that it would probably require modifications in order to make it run with the current versions of JSBSim and Python. \\
+
+Development for PyJSBSim is not active either, but the JSBSim development team uses it as part of their unit tests. Thus the copy of PyJSBSim in the JSBSim code repository is guaranteed to work with the current version of JSBSim. However PyJSBSim only implements a small subset of the JSBSim API and it doesn't give the option to create new aircraft models from within python since these consists of \gls{xml} files that need to be manually created before running the simulation. \\
+
+Thus the next step was to extend PyJSBSim to include the extra features that would be needed and create a set of functions capable of creating the JSBSim aircraft model \gls{xml} files. PyJSBSim is written in Cython, a static compiler for Python and the extended Cython programming language. Code written in Cython can seamlessly interact with C/C++ and Python code, making it the perfect tool to write interfaces between Python and C++ code. \\
+
+The first modifications where to make PyJSBSim run properly in Python 3. The code was already running, but because of changes in the language some extra type conversions where necessary in order to make the Python side of the interface easier to work with. One important feature that had to be added was the ability to give JSBSim tables with predetermined the control inputs. The rest of the changes made to PyJSBSim consisted of exposing a few more C++ functions and classes to Python and annotating the Cython code with type information.\\
+
+As mentioned before, a tool had to be developed in order to to create the JSBSim aircraft models from within Python code. Since the input files contain \gls{xml} code, Jinja2, a templating language for Python, was chosen to write \gls{xml} template files that could then be filled in from the python code. \\
+
+However before development of this tool could start, the aerodynamic model had to be defined. The reason for this is because JSBSim does not have an aerodynamic model. Instead the equations to calculate the aerodynamic forces need to be given in the input \gls{xml} files. To keep it simple, the linear model described in the TU Delft Flight dynamics course was used as the basis \cite{fdreader}. \\
+
+The aerodynamic forces and moments are calculated using equations \ref{eq:f_a} and \ref{m_a}. The aerodynamic coefficients in the body reference frame are defined in \ref{eq:body_coefs} and the dimensionless rates used in \ref{eq:body_coefs} are defined in \ref{eq:dim_less_rates}.
+
+\begin{equation}
+\label{eq:f_a}
+{F_A} = \frac{1}{2}\rho V_{tas}^2S\left[ {\begin{array}{*{20}{c}}
+{{C_X}}\\
+{{C_Y}}\\
+{{C_Z}}
+\end{array}} \right]\\
+\end{equation}
+
+\begin{equation}
+\label{eq:m_a}
+{M_A} = \frac{1}{2}\rho {V^2}S\left[ {\begin{array}{*{20}{c}}
+{{C_l} \cdot b}\\
+{{C_m} \cdot \bar c}\\
+{{C_n} \cdot b}
+\end{array}} \right]
+\end{equation}
+
+\begin{equation}
+\label{eq:body_coefs}
+\arraycolsep=1.4pt\def\arraystretch{2.2}
+\begin{array}{l}
+{C_X} = C_{{X_0}} + ({C_{{X_u}}} - 2\;{C_{{X_0}}})\;\hat u + {C_{{X_\alpha }}}\alpha  + {C_{{X_{{\alpha ^2}}}}}{\alpha ^2} + C_{{X_{\dot{\alpha}}}}\hat{\dot{\alpha}}  + {C_{{X_q}}}\hat q + {C_{{X_{{\delta _e}}}}}{\delta _e}\\
+{C_Y} = {C_{{Y_\beta }}}\beta  + {C_{{Y_p}}}\hat p + {C_{{Y_r}}}\hat r + {C_{{Y_{{\delta _a}}}}}{\delta _a} + {C_{{Y_{{\delta _r}}}}}{\delta _r}\\
+{C_Z} = ({C_{{Z_u}}} - 2\;{C_{{Z_o}}})\;\hat u + {C_{{Z_\alpha }}}\alpha  + {C_{{Z_{\dot{\alpha}}}}\hat{\dot{\alpha}} + {C_{{Z_q}}}\hat q + C_{{Z_{{\delta _e}}}}}{\delta _e}\\
+{C_l} = {C_{{l_\beta }}}\beta  + {C_{{l_p}}}\hat p + {C_{{l_r}}}\hat r + {C_{{l_{{\delta _a}}}}}{\delta _a} + {C_{{l_{{\delta _r}}}}}{\delta _r}\\
+{C_m} = {C_{{m_u}}}\hat u + {C_{{m_\alpha }}}\alpha  + C_{{m_{\dot{\alpha}}}}\hat{\dot{\alpha}}  + {C_{{m_q}}}\hat q + {C_{{m_{{\delta _e}}}}}{\delta _e}\\
+{C_n} = {C_{{n_\beta }}}\beta  + {C_{{n_p}}}\hat p + {C_{{n_r}}}\hat r + {C_{{n_{{\delta _a}}}}}{\delta _a} + {C_{{n_{{\delta _r}}}}}{\delta _r}
+\end{array}
+\end{equation}
+
+\begin{equation}
+\label{eq:dim_less_rates}
+\arraycolsep=1.4pt\def\arraystretch{2.2}
+\begin{array}{l}
+\hat u = \frac{{u - V}}{V}\\
+\hat{\dot{\alpha}} = \frac{\dot{\alpha}\bar{c}}{V}\\
+\hat p = \frac{{pb}}{{2V}}\\
+\hat q = \frac{{q\bar c}}{V}\\
+\hat r = \frac{{pb}}{{2V}}
+\end{array}
+\end{equation}
+
+Since the aircraft is assumed to be trimmed at the beginning of the simulation, it is assumed that the thrust equals the aerodynamic drag. Thus the thrust and the aerodynamic force term with $C_{x_0}$ cancel each other out and $C_{x_0}$ is thus be removed from the equation. Thus the equation for the $C_x$ coefficient is defined in \ref{c_x}\\
+
+\begin{equation}
+\label{c_x}
+{C_X} = ({C_{{X_u}}} - 2\;{C_{{X_0}}})\;\hat u + {C_{{X_\alpha }}}\alpha  + {C_{{X_{{\alpha ^2}}}}}{\alpha ^2} + C_{{X_{\dot{\alpha}}}}\hat{\dot{\alpha}}  + {C_{{X_q}}}\hat q + {C_{{X_{{\delta _e}}}}}{\delta _e}
+\end{equation}
+
+In order to check whether the aerodynamic model is correct it is neccesary to compare the simulation results with a different simulation. to do this the space state model from the flight dynamics reader\cite{fdreader} was chosen. The coefficients used in the test are those for the Cessna Ce500 'Citation' during cruise as there available in the same reader.\\
+
+A JSBSim input file was manually created with the aerodynamic model given above and the values for the Citation where filled in. The results are shown in figures  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
