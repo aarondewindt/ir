@@ -11,6 +11,11 @@
 \newacronym{lti}{LTI}{Linear Time Invariant}
 \newacronym{usaf}{USAF}{United States Air Force}
 \newacronym{mmoi}{MMOI}{Mass Moment Of Intertia}
+\newacronym{iekf}{IEKF}{Iterated Extended Kalman Filter}
+\newacronym{ekf}{EKF}{Extended Kalman Filter}
+\newacronym{kf}{KF}{Kalman Filter}
+
+
 
 
 % examples
@@ -21,4 +26,136 @@
 \newglossaryentry{angelsperarea}{
   name = $K_{XZ}$ ,
   description = The number of angels per unit area,
+}
+
+\newglossaryentry{x_k}{
+name = $\bar x_k $,
+description =  Current real system state,
+}
+
+
+\newglossaryentry{x_k1}{
+name = $\bar x_{k+1}$,
+description =  One-step-ahead real system state ,
+}
+
+\newglossaryentry{x_kk}{
+name = $\hat {\bar x}_{k,k}$,
+description =  Current optimal estimated system state ,
+}
+
+\newglossaryentry{x_k1k}{
+name = $\hat {\bar x}_{k+1, k}$,
+description =  One-step-ahead state prediction,
+}
+
+
+\newglossaryentry{x_k1k1}{
+name = $\hat {\bar x}_{k+1, k+1}$,
+description =  One-step-ahead optimal estimated system state,
+}
+
+\newglossaryentry{eps_k1k}{
+name = $\hat {\bar \epsilon}_{k+1, k}$,
+description =  State prediction error. $[\hat {\bar x}_{k+1, k} - \bar x_{k+1}]$,
+}
+
+
+
+
+
+
+
+
+
+
+
+\newglossaryentry{mat_a}{
+name = $A$,
+description =  Continous state space dynamics matrix,
+}
+
+\newglossaryentry{mat_b}{
+name = $B$,
+description =  Continous state space input matrix,
+}
+
+\newglossaryentry{mat_g}{
+name = $G$,
+description =  Continous state space system noise input matrix,
+}
+
+\newglossaryentry{mat_c}{
+name = $C$,
+description =  Continous state space observation matrix,
+}
+
+\newglossaryentry{mat_d}{
+name = $D$,
+description =  Continous and discrete state space feedthrough matrix,
+}
+
+\newglossaryentry{mat_phi}{
+name = $\Phi_{k+1,k}$,
+description =  Discrete state space dynamics matrix,
+}
+
+\newglossaryentry{mat_psi}{
+name = $\Psi_{k+1,k}$,
+description =  Discrete state space input matrix,
+}
+
+\newglossaryentry{mat_gamma}{
+name = $\Gamma_{k+1,k}$,
+description =  Discrete state space system noise input matrix,
+}
+
+\newglossaryentry{mat_h}{
+name = $H_{k+1,k}$,
+description =  Discrete state space observation matrix,
+}
+
+\newglossaryentry{mat_p_kk}{
+name = $P_{k+1,k}$,
+description =  Previous step covariance matrix of state estimation error,
+}
+
+\newglossaryentry{mat_p_k1k}{
+name = $P_{k+1,k}$,
+description =  Covariance matrix of state prediction error,
+}
+
+\newglossaryentry{mat_p_k1k1}{
+name = $P_{k+1,k}$,
+description =  Covariance matrix of state estimation error,
+}
+
+\newglossaryentry{mat_f_kal}{
+name = $f(\bullet)$,
+description =  Non-linear system dynamics,
+}
+
+\newglossaryentry{mat_h_kal}{
+name = $h(\bullet)$,
+description =  Non-linear observation function,
+}
+
+\newglossaryentry{mat_g_kal}{
+name = $G(\bullet)$,
+description =  Non-linear system noise matrix function,
+}
+
+\newglossaryentry{mat_z_bar}{
+name = $\bar z$,
+description =  Measurement vector,
+}
+
+\newglossaryentry{mat_x_bar}{
+name = $\bar x$,
+description =  State vector,
+}
+
+\newglossaryentry{mat_u_bar}{
+name = $\bar u$,
+description =  Input vector,
 }

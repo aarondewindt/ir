@@ -68,10 +68,13 @@
 
 \input{chapters/0_preface.tex}
 
-\glsaddall
+
+\clearpage
+\glsaddall{main}
 \printglossary[type=\acronymtype,title=Abbreviations]
 
 \printglossary[title=Symbols]
+
 
 
 %% Use Arabic numerals for the page numbers of the chapters.
@@ -85,8 +88,12 @@
 \input{chapters/5_conclusion.tex}
 
 
+
+
 %% Use letters for the chapter numbers of the appendices.
 \appendix
+
+
 
 \input{chapters/A_cc.tex}
 \input{chapters/B_self_reflection.tex}
@@ -94,8 +101,8 @@
 
 %\input{appendix-a}
 
-\clearpage 
-% \printglossaries
+
+% \printglossary
 
 % \nocite{*}  % Remove this line in the future.
 \bibliography{report}
