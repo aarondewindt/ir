@@ -1,0 +1,24 @@
+\chapter{Conclusions}
+With the latest progress at DAWN Aerospace, there has been more interest in the development of the Control and Navigation Systems (\gls{cns}). However before development can begin on the design of new control systems a flight model is needed. The end goal of this internship project is the development of tools to generate the necessary flight models.\\
+
+The motion of an aircraft in flight can be simulated using the equation of motion with known forces, moments and mass properties. The challenge in aircraft simulation is the modeling of the aerodynamic properties of the aircraft. Thus this project mainly focuses on the development of tools that estimate aerodynamic coefficient of the aircraft.\\
+
+There are several options to when it comes to estimating the aerodynamic coefficients of an aircraft. The process chosen during this project is to first determine the coefficient empirically using Digital Datcom. The second step is to use the \textit{two-step approach} system identification method to determine the aerodynamic coefficients based on real flight data. Finally the two data sets are combined using the Co-Kriging statistical interpolation technique to obtain an accurate aerodynamic model spanning throughout a wide range of flight conditions.\\
+
+The reason this approach is chosen is because empirical model can quickly generate a large data set of coefficients, covering a large range of flight conditions. However these models tend to contain errors that have to be corrected for. Models based on system identification are more accurate, but because they require the aircraft to be physically flown, the number of flight conditions in which the coefficients can be determined is limited. Thus the idea is to use the coefficients from the system identification process to correct the empirical model.\\
+
+First in order to obtain the necessary test data it has been decided to use JSBSim to simulate an aircraft with known aerodynamics. Since these tools are developed in Python, it was necessary to create a software library that serves as an interface between python and JSBSim which written in C++. \\
+
+Digital Datcom was chosen as the source of the empirical aerodynamic model, thus a python interface around Digital Datcom has been developed. \\
+
+As already mentioned the two step approach has been chosen as the method used to estimate the aerodynamic properties of the aircraft. As the name suggests it consists of two steps. The first step is the state reconstruction step, Here the state of the aircraft during the flight is estimated using measurements that contain noise and biases which have to be corrected for. Unmeasurable states can also be estimated during this step. An Iterated Extended Kalman Filter (\gls{iekf}) is used in this step.\\
+
+The second step is the parameter estimation step. First a model structure is chosen and then the parameters in this model are estimated using some parameter estimation method. In the case of this project, the model structure was chosen such that it is linear on the parameters and that the parameters are loosely correlated to each other. This meant that a simple least-squares could be used to estimate the parameters. \\
+
+The \gls{iekf} is currently not estimating the wind speeds and sensor biases correctly. However, if these are kept small, it can correctly estimate the state of the aircraft.\\
+
+The parameter estimation is working properly, the resulting models match the original models. However improvement is still possible. Currently, not all of the coefficients are being estimated and the current method requires ideal input data with low noise and other sensor errors. \\
+
+It was not possible to fully develop the model mixing tool using the Co-Kriging statistical interpolation algorithm. So instead, some pre-existing code was tested to check the capabilities of such a tool. The results look promising, but more research is required.\\
+
+To summarize, initial work on some basic tools that could be used for flight model syntheses was performed, but further development of these tools is necessary.

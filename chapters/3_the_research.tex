@@ -26,6 +26,11 @@ Thus the main problem to be solved is: How can an accurate flight model be creat
 The end goal of the project is to research into the development of the tools necessary to create accurate flight simulation models. The end product will be a set of basic tools demonstrating the steps that need to be taken and a list of recommendations for the further development of these tools.
 
 \section{Methodology}
+Since the work performed during the project consisted of the development of new tools and not did not involve an experiment, the methodology section is not applicable. However, some rules where followed to keep the project code well structured and tested. This section will thus briefly explain these. \\
+
+Most of the code in the tools is written in Python, this means that the \textit{PEP-8 style guide for python code} was followed in order to keep to coding style consistent across modules and to keep the code as readable as possible. The code is well commented which should help with future development. Most of the code is unit tested with unit-tests written in the Python unit testing framework. \\
+
+To keep the transfer of data between modules as consistent as possible, xarray dataset objects are used to store flight data, simulation results, etc. Unfortunately it was not always possible to keep the naming scheme of the variables inside these objects consistent, due to the multiple sources of data and third party tools being used. To cope with this problem there are several functions that translate the variable names between modules, and assert statement at the beginning of certain functions are used to check the contents of the datasets before the code is run. \\
 
 \section{Work performed}
 \subsection{Introduction and familiarization with the company and project}
@@ -54,7 +59,9 @@ Since the focus for now will be on the development of these tools. It is necessa
 
 Digital Datcom is a freely available program capable if calculating the aerodynamic coefficients using empirical method, It is used to create the aerodynamic models used to develop the rest of the tools.\\
 
-The two step approach is chosen as the system identification method. The first step is the state reconstruction step. Here sensor errors are determined and corrected and unmeasurable states are estimated. The next step is the parameter estimation step. Here the model structure is selected and the parameters of the chosen model are estimated 
+The two step approach is chosen as the system identification method. The first step is the state reconstruction step. Here sensor errors are determined and corrected and unmeasurable states are estimated. The next step is the parameter estimation step. Here the model structure is selected and the parameters of the chosen model are estimated.\\
+
+To combine the models a tool implementing the Co-Kriging statistical interpolation technique has been developed.
 
 \subsection{3rd party tools interface development}
 To limit the amount of work necessary to complete these tasks, some third party software packages will be used. However since the to be developed tools will be written in Python it's necessary to make sure it is possible to interface with these tools from within a python script. The programs that will need interfaces are JSBSim and Digital Datcom.
@@ -96,7 +103,7 @@ The aerodynamic forces and moments are calculated using equations \autoref{eq:f_
 
 \begin{equation}
 \label{eq:body_coefs}
-\arraycolsep=1.4pt\def\arraystretch{2.2}
+\arraycolsep=1.0pt\def\arraystretch{1.5}
 \begin{array}{l}
 {C_X} = C_{{X_0}} + ({C_{{X_u}}} - 2\;{C_{{X_0}}})\;\hat u + {C_{{X_\alpha }}}\alpha  + {C_{{X_{{\alpha ^2}}}}}{\alpha ^2} + C_{{X_{\dot{\alpha}}}}\hat{\dot{\alpha}}  + {C_{{X_q}}}\hat q + {C_{{X_{{\delta _e}}}}}{\delta _e}\\
 {C_Y} = {C_{{Y_\beta }}}\beta  + {C_{{Y_p}}}\hat p + {C_{{Y_r}}}\hat r + {C_{{Y_{{\delta _a}}}}}{\delta _a} + {C_{{Y_{{\delta _r}}}}}{\delta _r}\\
@@ -741,6 +748,155 @@ For this test the accelerometer biases where set to $0.001~[m\;s^{-2}]$, gyro bi
 \end{figure}
 
 As it can be seen the \gls{iekf} is able to correctly estimate the X-coordinate and pitch angle. However the rest of the plots show that the filter is not working properly. The wind and sensor bias estimates are not converging and the Z-coordinate estimate is being smoothed to much. The cause of the errors could be due to errors in the derivation of the model, initial state or initial covariance matrix of state estimation error.
+
+
+\subsection{Parameter estimation}
+The section will focus on the parameter estimation step. The goal is to estimate the values of the aerodynamic coefficients using the state information calculated in the state reconstruction step. 
+
+The aerodynamic force coefficients can be calculated from the acceleration measurements using \ref{eq:aero_force_calc}.
+\begin{equation}
+    \begin{array}{l}
+        {C_x} = \frac{{{F_x}}}{{{\raise0.7ex\hbox{$1$} \!\mathord{\left/
+         {\vphantom {1 2}}\right.\kern-\nulldelimiterspace}
+        \!\lower0.7ex\hbox{$2$}}\rho {V^2}S}} = \frac{{m{A_x}}}{{\frac{1}{2}\rho {V^2}S}}\\
+        {C_y} = \frac{{{F_y}}}{{{\raise0.7ex\hbox{$1$} \!\mathord{\left/
+         {\vphantom {1 2}}\right.\kern-\nulldelimiterspace}
+        \!\lower0.7ex\hbox{$2$}}\rho {V^2}S}} = \frac{{m{A_y}}}{{\frac{1}{2}\rho {V^2}S}}\\
+        {C_z} = \frac{{{F_z}}}{{{\raise0.7ex\hbox{$1$} \!\mathord{\left/
+         {\vphantom {1 2}}\right.\kern-\nulldelimiterspace}
+        \!\lower0.7ex\hbox{$2$}}\rho {V^2}S}} = \frac{{m{A_z}}}{{\frac{1}{2}\rho {V^2}S}}
+        \end{array}
+    \label{eq:aero_force_calc}
+\end{equation}
+
+The aerodynamic moments are calculated from the rotation rates and then non-dimensionalized to get the aerodynamic moment coefficients, as shown in \ref{eq:aero_mom_calc}.
+
+\begin{equation}
+    \begin{array}{l}
+        {C_l} = \frac{{{M_x}}}{{{\raise0.7ex\hbox{$1$} \!\mathord{\left/
+         {\vphantom {1 2}}\right.\kern-\nulldelimiterspace}
+        \!\lower0.7ex\hbox{$2$}}\rho {V^2}Sb}} = \frac{{\dot p{I_{xx}} + qr\left( {{I_{zz}} - {I_{yy}}} \right) - \left( {pq + \dot r} \right){I_{xz}}}}{{{\raise0.7ex\hbox{$1$} \!\mathord{\left/
+         {\vphantom {1 2}}\right.\kern-\nulldelimiterspace}
+        \!\lower0.7ex\hbox{$2$}}\rho {V^2}Sb}}\\
+        {C_m} = \frac{{{M_y}}}{{{\raise0.7ex\hbox{$1$} \!\mathord{\left/
+         {\vphantom {1 2}}\right.\kern-\nulldelimiterspace}
+        \!\lower0.7ex\hbox{$2$}}\rho {V^2}S\bar c}} = \frac{{\dot q{I_{yy}} + rp\left( {{I_{xx}} - {I_{zz}}} \right) + \left( {{p^2} - {r^2}} \right){I_{xz}}}}{{{\raise0.7ex\hbox{$1$} \!\mathord{\left/
+         {\vphantom {1 2}}\right.\kern-\nulldelimiterspace}
+        \!\lower0.7ex\hbox{$2$}}\rho {V^2}S\bar c}}\\
+        {C_n} = \frac{{{M_z}}}{{{\raise0.7ex\hbox{$1$} \!\mathord{\left/
+         {\vphantom {1 2}}\right.\kern-\nulldelimiterspace}
+        \!\lower0.7ex\hbox{$2$}}\rho {V^2}Sb}} = \frac{{\dot r{I_{zz}} + pq\left( {{I_{yy}} - {I_{xx}}} \right) + \left( {qr - \dot p} \right){I_{xz}}}}{{{\raise0.7ex\hbox{$1$} \!\mathord{\left/
+         {\vphantom {1 2}}\right.\kern-\nulldelimiterspace}
+        \!\lower0.7ex\hbox{$2$}}\rho {V^2}Sb}}
+        \end{array}
+        \label{eq:aero_mom_calc}
+\end{equation}
+
+The model structure proposed in \textit{van den Hoek, et al} \cite{van_den_hoek} was used as the basis and \autoref{eq:pe_mod_struct} shows the chosen model structure. The first reason this model was chosen is because it already contains most of the parameters present in the aerodynamic model that was chosen during the development of the JSBSim python interface, shown in \autoref{eq:body_coefs}. Additionally the to be estimated coefficients are linear to the known parameters and there are no strong correlations between these parameter. This means that a simple least squares estimator can be used to estimate the value of the unknown values.\\
+
+Before continuing with the parameter estimation process a short explanation is given for each coefficient that has been excluded from the parameter estimatation model structure.
+
+\begin{itemize}
+    \item \textbf{$c_{X_u}$, $c_{m_u}$, $c_{Z_u}$}\\
+    In order to accurately estimate these coefficients, flight data at different airspeeds is required.
+
+    \item \textbf{$C_{Y_{\beta^2}}$}\\
+    This coefficient was not implemented in the JSBSim interface, and it's thus excluded from the parameter estimation. Future improvements could include this coefficient.
+    
+\end{itemize}
+
+\begin{equation}
+    \begin{array}{*{20}{l}}
+        {{C_X} = {C_{{X_0}}} + {C_{{X_\alpha }}}\alpha  + {C_{{X_{{\alpha ^2}}}}}{\alpha ^2} + C_{{X_{\dot{\alpha}}}}\hat{\dot{\alpha}} + {C_{{X_q}}}\hat q + {C_{{X_{{\delta _e}}}}}{\delta _e}}\\
+        
+        {{C_Y} = {C_{{Y_\beta }}}\beta  + {C_{{Y_p}}}\hat p + {C_{{Y_r}}}\hat r + {C_{{Y_{{\delta _a}}}}}{\delta _a} + {C_{{Y_{{\delta _r}}}}}{\delta _r}}\\
+        {{C_Z} = {C_{{Z_\alpha }}}\alpha + C_{{Z_{\dot{\alpha}}}}\hat{\dot{\alpha}} + {C_{{Z_q}}}\hat q + {C_{{Z_{{\delta _e}}}}}{\delta _e}}\\
+        {{C_l} = {C_{{l_\beta }}}\beta  + {C_{{l_p}}}\hat p + {C_{{l_r}}}\hat r + {C_{{l_{{\delta _a}}}}}{\delta _a} + {C_{{l_{{\delta _r}}}}}{\delta _r}}\\
+        {{C_m} = {C_{{m_u}}}\hat u + {C_{{m_\alpha }}}\alpha + C_{{m_{\dot{\alpha}}}}\hat{\dot{\alpha}} + {C_{{m_{\dot \alpha }}}}\hat \dot \alpha  + {C_{{m_q}}}\hat q + {C_{{m_{{\delta _e}}}}}{\delta _e}}\\
+        {{C_n} = {C_{{n_\beta }}}\beta  + {C_{{n_p}}}\hat p + {C_{{n_r}}}\hat r + {C_{{n_{{\delta _a}}}}}{\delta _a} + {C_{{n_{{\delta _r}}}}}{\delta _r}}
+    \end{array}
+    \label{eq:pe_mod_struct}
+\end{equation}
+
+To test whether the parameter estimation tools works, the data provided with the \textit{AE4320 System Identification of Aerospace Vehicles} assignment is used. The coefficients with a significant contribution to symmetric motion and asymmetric motion are estimated separately. This means that the data set with the elevator manoeuvre is used to estimate the $C_x$, $C_z$ and $C_m$ coefficients and the data sets with the aileron and rudder manoeuvres are used to estimate the $C_y$, $C_l$ and $C_n$ coefficients. This is because the symmetric maneuvers do not contain information relevant to the asymmetric coefficients, thus if this data is used it ends up adding errors to the resulting model.\\
+
+The least-squared residuals are shown in \autoref{tab:est_residuals}. 
+
+\begin{center}
+\begin{tabular}{ c | c}
+Coefficient & Residual \\
+\hline\hline
+${C_X}$ & 0.0011744 \\ 
+${C_Y}$ & 0.01340616 \\
+${C_Z}$ & 0.03849996 \\
+${C_l}$ & 0.00320451 \\
+${C_m}$ & 0.11114611 \\
+${C_n}$ & 0.00226804 
+\label{tab:est_residuals}
+\end{tabular}
+\end{center}
+
+The identified model is simulated in JSBSim and compared to the original input flight data. The simulation results for 3-2-1-1 manoeuvres are shown in Figures~\ref{fig:pest_da3211},~\ref{fig:pest_dr3211}~and~\ref{fig:pest_de3211}.\\
+
+\begin{figure}
+    \centering
+    \includegraphics[width=14cm]{figures/pest_da3211.png}
+    \caption{Comparison between the identified model simulation results and original input data, during an aileron 3211 manoeuvre.}
+    \label{fig:pest_da3211}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=14cm]{figures/pest_dr3211.png}
+    \caption{Comparison between the identified model simulation results and original input data, during an rudder 3211 manoeuvre.}
+    \label{fig:pest_dr3211}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=14cm]{figures/pest_de3211.png}
+    \caption{Comparison between the identified model simulation results and original input data, during an elevator 3211 manoeuvre.}
+    \label{fig:pest_de3211}
+\end{figure}
+
+As the simulation results show, the coefficients for asymmetric motion seem to have been estimated properly. For symmetric motion there are still errors in the model. One probable cause of these errors are the missing coefficients in the current model structure. 
+
+
+
+\subsection{Model mixing}
+As already mentioned earlier in this report a tool has been developed to combine the aerodynamic coefficients from the system identification process with the coefficients that are estimated empirically. The reason this is done is because the coefficients that are estimated empirically contain errors, but are easy to calculate for a wide range of flight conditions. And the coefficients estimated using system identification of real flight data are more accurate, but it requires the aircraft to be physically flown to obtain the necessary data. This limits the number of flight conditions at which the coefficients can be determined. To do this the Co-Kriging statistical interpolation technique is used. Before the Co-Kriging is explained, its single variable variant, the Kriging is explained. \\
+
+\subsubsection{Kriging}
+Originally developed in the field of geostatistics, the Kriging is an interpolation method that uses a Gaussian process and a set of calculated covariance and hyperparameter to obtain a new set of estimated values. It is essentially an interpolation technique that instead of using polynomials like most spines, it uses basis functions in the form shown in \ref{eq:kriging_form}. The Kriging tries to estimate the most probable function describing the values between the interpolation points, unlike splines that just find a smooth line between the interpolation points.\cite{jones2001taxonomy}
+
+\begin{equation}
+    {e^{ - \sum\nolimits_{l = 1}^d {{\theta_l}{{\left| {{z_l}} \right|}^{{p_l}}}} }}
+    \label{eq:kriging_form}
+\end{equation}
+
+The hyperparameter $p_l$ can be thought of a measurement of the smoothness of the function. In most cases it can be assumed that $p_l=2$. This means that the function does not contain discontinuities and is infinitely differentiable. In this case the function is in the same form as a Gaussian distribution with variance $1/\theta_l$. Thus $\theta_l$ determines how fast the function can change the estimated value the further it moves from one of the interpolation points.\cite{forrester2007multi}.
+
+\subsubsection{Co-Kriging}
+The Co-Kriging is an extension to the Kriging that can be used to combine two sets of correlated or negatively correlated data. The structure of the method is similar to the Kriging, but it takes in two sets of hyperparameter for each data set. It also adds a difference model shown in \autoref{eq:krigin_diff} relating the cheap (subscript c) and expensive (subscript e), where $\rho$ is a scaling factor between the two data sets.
+
+\begin{equation}
+    d = y_c-\rho y_c(X_e)
+    \label{eq:krigin_diff}
+\end{equation}
+
+
+\subsubsection{Implentation}
+Unfortunately it was not possible to develop a fully working implementation of the Co-Kriging tool within the time frame of the internship. Instead a pre-existing tool developed at \gls{dare}, was tested. The results of a test on 1 dimensional data is shown in \autoref{fig:cokrig_1d}. The example was obtained from "Multi-fidelity optimization via surrogate modelling" by Forrester, Sobester and Keane\cite{forrester2007multi}.\\
+
+\begin{figure}
+    \centering
+    \includegraphics[width=14cm]{figures/cokrig_1d.png}
+    \caption{Co-Kriging example on 1 dimensional data}
+    \label{fig:cokrig_1d}
+\end{figure}
+
+
+
 
 
 

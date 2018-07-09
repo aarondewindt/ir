@@ -1,0 +1,40 @@
+\chapter{Recommendations}
+
+This chapter gives a list of recommendations on where work on the Control and Navigation System (\gls{cns}) should continue next.
+
+\section{State estimation and flight reconstruction}
+The main recommendation is to focus on the state estimation during flight and the flight reconstruction algorithms for post processing. This data provides a significant part of the information necessary for the system identification process, thus it is imperative for it to be as accurate as possible. The state estimate can be improved by either upgrading the current set of sensors or by further developing the state estimation models. \\
+
+Two important input parameters in aircraft aerodynamic models are the angle of attack and side slip angle. At this moment the DAWN vehicle has no sensors capable of measuring these directly, thus the only option is to estimate them using the the velocity estimates by the GPS measurements and on-board IMU. However, these estimates are only accurate when flying under ideal wind conditions and the noise in the sensor measurements will have a significant effect in the accuracy of these estimates.
+Thus it is recommended to develop or acquire angle of attack and side slip sensors. \\
+
+Currently the DAWN vehicle uses simple MEMS based IMU's for it's state estimate. These type of sensors are good enough for the control of small to medium sized vehicles for a relatively short amount of flight time. However these sensors are known to be quite noisy and contain biases that will cause the state estimates to drift during time. The noise in the sensor measurements complicate the system identification process. Thus it is recommended to acquire low noise IMU's. These could be of the shelf high quality, possibly MEMS based IMU's. Another option is to develop sensor fusion algorithms that combine the measurements from multiple MEMS based IMU's to determine the errors in each individual sensor during flight.\\
+
+Furthermore, more research is required into the state reconstruction method. Currently unmeasurable states such as the previously mentioned angle of attack and side slip angle could be estimated. An Iterated Extended Kalman Filter (\gls{iekf}) is used as the state reconstruction algorithm. However the \gls{iekf} uses local linearizations of the non-linear system, this means that if the non-linearities are significant around the local points of linearization, then the filter might have trouble converging to the correct value. One possible solution to this problem is to use some other Kalman filter variant. \textit{van den Hoek, et al} \cite{van_den_hoek} suggests the use of an \gls{ukf}. The advantages of the \gls{ukf} are due to the fact that it evaluates the non-linear system of equation at called sigma points to estimate the covariance matrix of estimation errors. This means that the all the non-linearities are taken into account without having to iterate, making it computationally more efficient and accurate than the \gls{iekf} and since there are no linearizations, it's not necessary to calculate the Jacobians, making it easier to implement.
+
+
+\section{Parameter estimation}
+The current parameter estimation tool is working, however the model structure can still be extended with more coefficients, which should results in more accurate models. The main problem with the parameter estimation tool is that it uses the ordinary least-squares as the parameter estimation algorithm. The ordinary least squares makes several assumptions that may not be valid. The mayor ones being, that is assumes that the variance in the data does not change with time and that the parameters are uncorrelated to each other. Furthermore, the ordinary least squares requires the model structure to be linear in the parameters. It is recommended to do more research into more advanced parameter estimation algorithms.
+
+\section{System identification flight tests maneuvers}
+During the development of the tool, it became clear that the maneuvers performed during the flight have a significant influence into the accuracy of the final model. Thus it is recommended to research into the choice of maneuvers that would be performed during the flight tests.
+
+\section{Computational aerodynamic models}
+As it is already mentioned in the report, it is possible to determine the aerodynamic coefficients without having to fly the aircraft, there are several such methods. This project explored the use of Digital Datcom as a source of empirical aerodynamic data. However there are other alternatives, such as XFLR5, which is also able to estimate aerodynamic coefficients is a short time span.
+It may also be worth looking into aerodynamic models based on more complicated computational methods, such as methods based on potential flow or CFD. \\
+
+
+\section{Model mixing}
+The project briefly explored the idea of mixing different aerodynamic models from different sources. The main advantage of such a tool is that is essentially allows the creation of an aerodynamic model that is defined throughout a wide range of flight conditions, thanks to the \textit{cheap} empirical data. But that is corrected using more \textit{expensive} aerodynamic data around certain flight conditions.
+Some research was done on the Co-Kriging statistical interpolation algorithm and a few tests where performed using a pre-existing implementation. The results seemed promising, thus the recommendation is to continue collecting more information on the Co-Kriging and create a test case with more input dimensions, aerodynamic data, etc. 
+It is also recommended to not use the current Python implementation of the Co-Kriging. Since it's written in Python the performance of the script is quite low, specially when more points are added. the script is also not fully unit-tested, thus it may still have some errors. 
+Instead it is recommended the use the Co-Kriging implementation available in the gstat package of the R programming language.
+
+\section{Code management, refactoring and documentation}
+The tools written during this project, where developed independently from any pre-existing code within DAWN. This was due to the lack of a \gls{vcs} system. Thus it was decided at the beginning of the project that the tools would be developed inside of a new git repository that would reside in the shared folder service already active within DAWN.
+However, as more code is being developed, it is highly recommended to setup a \gls{vcs} managing system such as gitlab or to open an enterprise account on Github or comparable website. These managing systems provide many advantages including but not limited to, easy distribution of code between collaborators, managing of multiple project with multiple, possibly parallel, versions, automatic/scheduled unit-testing of the code, etc. \\
+
+Since the tools developed during the project use data from different sources and interfaces with multiple third party tools, it unfortunately is not consistent with the naming of variables, states, etc. Thus it is recommended to first define a consistent naming scheme, and then refactor the code so that it follows this scheme. This in turn also suggests the setup of a central documentation system for at least the code being developed here. 
+
+
+
