@@ -822,21 +822,24 @@ To test whether the parameter estimation tools works, the data provided with the
 
 The least-squared residuals are shown in \autoref{tab:est_residuals}. 
 
-\begin{center}
-\begin{tabular}{ c | c}
-Coefficient & Residual \\
-\hline\hline
-${C_X}$ & 0.0011744 \\ 
-${C_Y}$ & 0.01340616 \\
-${C_Z}$ & 0.03849996 \\
-${C_l}$ & 0.00320451 \\
-${C_m}$ & 0.11114611 \\
-${C_n}$ & 0.00226804 
-\label{tab:est_residuals}
-\end{tabular}
-\end{center}
+\begin{table}[h]
+    \begin{center}
+    \begin{tabular}{ c | c}
+    Coefficient & Residual \\
+    \hline\hline
+    ${C_X}$ & 0.0011744 \\ 
+    ${C_Y}$ & 0.01340616 \\
+    ${C_Z}$ & 0.03849996 \\
+    ${C_l}$ & 0.00320451 \\
+    ${C_m}$ & 0.11114611 \\
+    ${C_n}$ & 0.00226804 
+    \end{tabular}
+    \end{center}
+    \caption{Ordinary least squared residuals for each coefficient.}
+    \label{tab:est_residuals}
+    \end{table}
 
-The identified model is simulated in JSBSim and compared to the original input flight data. The simulation results for 3-2-1-1 manoeuvres are shown in Figures~\ref{fig:pest_da3211},~\ref{fig:pest_dr3211}~and~\ref{fig:pest_de3211}.\\
+The identified model is simulated in JSBSim and compared to the original input flight data. The simulation results for 3-2-1-1 manoeuvre are shown in Figures~\ref{fig:pest_da3211},~\ref{fig:pest_dr3211}~and~\ref{fig:pest_de3211}.\\
 
 \begin{figure}
     \centering

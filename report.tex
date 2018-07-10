@@ -45,7 +45,7 @@
 \subtitle[tudelft-black]{Dawn aerospace}
 \author[tudelft-white]{A. M.\ de\ Windt}
 \affiliation{Technische Universiteit Delft}
-\coverimage{tank.jpg}
+\coverimage{rocket_in_flight.png}
 \covertext[tudelft-white]{
 %     \textbf{Cover Text} \\
 %     possibly \\
@@ -61,6 +61,9 @@
 
 
 
+
+
+
 %% Include an optional title page.
 \input{title}
 
@@ -70,10 +73,15 @@
 
 
 \clearpage
-\glsaddall{main}
-\printglossary[type=\acronymtype,title=Abbreviations]
+\glsaddall{}
 
-\printglossary[title=Symbols]
+\listoffigures
+\listoftables
+\printglossary[type=\acronymtype,title=Abbreviations, nonumberlist]
+
+\printglossary[title=Symbols, nonumberlist]
+\printglossary[type=greek]
+
 
 
 

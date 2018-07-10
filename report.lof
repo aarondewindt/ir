@@ -1,0 +1,24 @@
+\select@language {english}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Coefficient table for the symmetric (left) and the asymmetric (right) modes\cite {fdreader}.\relax }}{10}{figure.caption.11}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Symmetric and asymmetric stability and control derivatives for the Cessna Ce500 \IeC {\textquoteleft }Citation\IeC {\textquoteright }, Cruise\cite {fdreader}.\relax }}{10}{figure.caption.12}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Response curves for a step elevator deflection ($\Delta \delta _e=-0.005\ [Rad]$ calculated by JSBSim and the \gls {lti} model.)\relax }}{11}{figure.caption.13}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Response curves for a pulse shaped aileron deflection ($\Delta \delta _a=0.025\ [Rad]$ calculated by JSBSim and the \gls {lti} model.)\relax }}{11}{figure.caption.14}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Response curves for a pulse shaped rudder deflection ($\Delta \delta _r=0.025\ [Rad]$ calculated by JSBSim and the \gls {lti} model.)\relax }}{12}{figure.caption.15}
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Elevator deflection during the 3211 manoeuvre.\relax }}{21}{figure.caption.16}
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Elevator deflection during the 3211 manoeuvre.\relax }}{21}{figure.caption.17}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Estimated wind velocities and sensor biases during the 3211 manoeuvre.\relax }}{21}{figure.caption.18}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Estimated wind velocities and sensor biases.\relax }}{22}{figure.caption.19}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Comparison between the identified model simulation results and original input data, during an aileron 3211 manoeuvre.\relax }}{23}{figure.caption.21}
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Comparison between the identified model simulation results and original input data, during an rudder 3211 manoeuvre.\relax }}{24}{figure.caption.22}
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Comparison between the identified model simulation results and original input data, during an elevator 3211 manoeuvre.\relax }}{24}{figure.caption.23}
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Co-Kriging example on 1 dimensional data\relax }}{26}{figure.caption.24}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsfinish 

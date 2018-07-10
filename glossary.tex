@@ -1,3 +1,5 @@
+\newglossary[tlg]{greek}{tld}{tdn}{Greek symbols}
+
 \makeglossaries
 
 % Software In the Loop \(SIL\)
@@ -57,6 +59,7 @@ description =  One-step-ahead optimal estimated system state,
 }
 
 \newglossaryentry{eps_k1k}{
+  type=greek,
 name = $\hat {\bar \epsilon}_{k+1, k}$,
 description =  State prediction error. $[\hat {\bar x}_{k+1, k} - \bar x_{k+1}]$,
 }
@@ -97,16 +100,19 @@ description =  Continous and discrete state space feedthrough matrix,
 }
 
 \newglossaryentry{mat_phi}{
+  type=greek,
 name = $\Phi_{k+1,k}$,
 description =  Discrete state space dynamics matrix,
 }
 
 \newglossaryentry{mat_psi}{
+  type=greek,
 name = $\Psi_{k+1,k}$,
 description =  Discrete state space input matrix,
 }
 
 \newglossaryentry{mat_gamma}{
+  type=greek,
 name = $\Gamma_{k+1,k}$,
 description =  Discrete state space system noise input matrix,
 }
